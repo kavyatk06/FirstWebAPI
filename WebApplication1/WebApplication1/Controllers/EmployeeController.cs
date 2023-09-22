@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.Metrics;
 using WebApplication1.Model;
 using WebApplication1.Models;
 
@@ -39,12 +40,23 @@ namespace WebApplication1.Controllers
 				return "Employee Added To Database";
 			}
 		}
-		[HttpGet("/ModifyEmployee")]
-		public int ModifyEmployee(int id)
+		[HttpPut]
+		public Employee EditEmployee(int id, [FromBody] Employee updatedEmployee)
 		{
-			int employeestatus = _repositoryEmployee.ModifyEmployee(id);
-			return employeestatus;
+
+
+
+			updatedEmployee.EmployeeId = id; // Ensure the ID in the URL matches the EmployeeId
+
+
+
+
+
+			Employee savedEmployee = _repositoryEmployee.UpdateEmployee(updatedEmployee);
+			return savedEmployee;
 		}
+
+
 		[HttpGet("/DeleteEmployee")]
 		public string DeleteEmployee(int id)
 		{
@@ -57,6 +69,27 @@ namespace WebApplication1.Controllers
 			{
 				return "Employee Successfully Deleted";
 			}
+		}
+
+		
+				[HttpGet("/GetAllEmployee")]
+		public IEnumerable<EmpViewModel> GetAllEmployees()
+		{
+			List<Employee> employees = _repositoryEmployee.AllEmployees();
+			var empList = (
+				from emp in employees
+				select new EmpViewModel()
+				{
+					EmpId = emp.EmployeeId,
+					FirstName = emp.FirstName,
+					LastName = emp.LastName,
+					BirthDate = (DateTime)emp.BirthDate,
+					HireDate = (DateTime)emp.HireDate,
+					Title = emp.Title,
+					City = emp.City,
+					ReportsTo =emp.ReportsTo
+				}).ToList();
+			return empList;
 		}
 	}
 }

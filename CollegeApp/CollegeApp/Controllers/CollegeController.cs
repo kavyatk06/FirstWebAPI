@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.Contracts;
+using System.Reflection.Metadata.Ecma335;
 
 namespace CollegeApp.Controllers
 {
@@ -10,20 +11,41 @@ namespace CollegeApp.Controllers
 	public class CollegeController : ControllerBase
 	{
 		[HttpGet]
-		public List<Student> GetStudents()
-		{	
-			List<Student> nplist=new List<Student>();
-			Student np = new Student();
-			np.Id = 1;
-			np.StudentName = "std1";
-			np.HouseName = "Lotus";
-			return nplist;
-			np.Id = 2;
-			np.StudentName = "std2";
-			np.HouseName = "Lilly";
-			return nplist;
+		public IEnumerable<Student> GetStudents()
+		{
+			return RepositoryStudent.s;
+
+
+
+
 
 
 		}
+		[HttpGet("id")]
+		public ActionResult<Student> GetStudentById(int id)
+		{
+			var student = RepositoryStudent.s.FirstOrDefault(s => s.Id == id);
+
+			if (student == null)
+			{
+				return NotFound(); // Return a 404 Not Found response if the student is not found.
+			}
+
+			return student;
+		}
+		[HttpGet("name")]
+		public ActionResult<Student> GetStudentByName(string name)
+		{
+			var student = RepositoryStudent.s.FirstOrDefault(s => s.StudentName == name);
+			return student;
+		}
+		[HttpDelete("id")]
+		public string  DeleteStudentById(int id)
+		{
+			var student = RepositoryStudent.s.FirstOrDefault(s => s.Id == id);
+			RepositoryStudent.s.Remove(student);
+			return "deleted";
+		}
 	}
+	
 }
