@@ -2,7 +2,7 @@
 {
 	public class EmpViewModel
 	{
-		public int? EmpId { get; set; }
+		public int EmpId { get; set; }
 		public string FirstName { get; set; } = string.Empty;
 		public string LastName { get; set; } = string.Empty;
 		public string Title { get; set; } = string.Empty;

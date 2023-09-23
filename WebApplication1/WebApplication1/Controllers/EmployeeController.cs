@@ -10,7 +10,7 @@ namespace WebApplication1.Controllers
 	[ApiController]
 	public class EmployeeController : ControllerBase
 	{
-		private RepositoryEmployee _repositoryEmployee;
+		static RepositoryEmployee _repositoryEmployee;
 		public EmployeeController(RepositoryEmployee repository)
 		{
 			_repositoryEmployee = repository;
@@ -28,52 +28,54 @@ namespace WebApplication1.Controllers
 			return employeeById;
 		}
 		[HttpPost("/AddEmployee")]
-		public string AddEmployee(Employee newEmployee)
+		public int AddEmployee(EmpViewModel newEmployee)
 		{
-			int employeestatus = _repositoryEmployee.AddEmployee(newEmployee);
-			if (employeestatus == 0)
-			{
-				return "Employee Not Added To Database Since it already exist";
-			}
-			else
-			{
-				return "Employee Added To Database";
-			}
+			Employee employee = new Employee();
+			employee.FirstName = newEmployee.FirstName;
+			employee.LastName = newEmployee.LastName;
+			employee.BirthDate = newEmployee.BirthDate;
+			employee.HireDate = newEmployee.HireDate;
+			employee.Title = newEmployee.Title;
+			employee.City = newEmployee.City;
+			employee.ReportsTo = newEmployee.ReportsTo> 0 ? newEmployee.ReportsTo : null;
+			// employee.EmployeeId
+			int res = _repositoryEmployee.AddEmployee(employee);
+			return res ;
+
 		}
-		[HttpPut]
-		public Employee EditEmployee(int id, [FromBody] Employee updatedEmployee)
+		[HttpPut("/UpdateEmployee")]
+		public int EditEmployee( EmpViewModel newEmployee)
 		{
-
-
-
-			updatedEmployee.EmployeeId = id; // Ensure the ID in the URL matches the EmployeeId
-
-
-
-
-
-			Employee savedEmployee = _repositoryEmployee.UpdateEmployee(updatedEmployee);
+			Employee employee = new Employee();
+			employee.EmployeeId= newEmployee.EmpId;
+			employee.FirstName = newEmployee.FirstName;
+			employee.LastName = newEmployee.LastName;
+			employee.BirthDate = newEmployee.BirthDate;
+			employee.HireDate = newEmployee.HireDate;
+			employee.Title = newEmployee.Title;
+			employee.City = newEmployee.City;// Ensure the ID in the URL matches the EmployeeId
+			int savedEmployee = _repositoryEmployee.UpdateEmployee(employee);
 			return savedEmployee;
 		}
 
 
-		[HttpGet("/DeleteEmployee")]
-		public string DeleteEmployee(int id)
+		[HttpDelete("/DeleteEmployee")]
+		public int DeleteEmployee(int id)
 		{
-			int employeestatus = _repositoryEmployee.DeleteEmployee(id);
-			if (employeestatus == 0)
+
+
+			Employee employee = _repositoryEmployee.FindEmpoyeeById(id);
+			if (employee != null)
 			{
-				return "Employee does not exist in the Database";
+				return _repositoryEmployee.DeleteId(employee); ;
 			}
-			else
-			{
-				return "Employee Successfully Deleted";
-			}
+		
+			return 0;
 		}
 
 		
-				[HttpGet("/GetAllEmployee")]
-		public IEnumerable<EmpViewModel> GetAllEmployees()
+		[HttpGet("/GetAllEmployee")]
+		public IEnumerable<EmpViewModel> GetAllEmployee()
 		{
 			List<Employee> employees = _repositoryEmployee.AllEmployees();
 			var empList = (

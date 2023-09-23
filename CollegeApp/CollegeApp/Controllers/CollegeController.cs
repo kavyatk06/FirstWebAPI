@@ -39,13 +39,16 @@ namespace CollegeApp.Controllers
 			var student = RepositoryStudent.s.FirstOrDefault(s => s.StudentName == name);
 			return student;
 		}
-		[HttpDelete("id")]
+		[HttpPost]
+		public Student <>
+		[HttpDelete("/")]
 		public string  DeleteStudentById(int id)
 		{
 			var student = RepositoryStudent.s.FirstOrDefault(s => s.Id == id);
 			RepositoryStudent.s.Remove(student);
 			return "deleted";
 		}
+
 	}
 	
 }

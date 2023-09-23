@@ -1,4 +1,7 @@
-﻿using WebApplication1.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Extensions;
+using System;
+using WebApplication1.Models;
 
 namespace WebApplication1.Model
 {
@@ -20,24 +23,50 @@ namespace WebApplication1.Model
 		}
 		public int AddEmployee(Employee newEmployee)
 		{
+			Employee? foundEmp = _context.Employees.Find(newEmployee.EmployeeId);
+			if (foundEmp != null)
+			{
+				throw new Exception("Duplicate Id");
+			}
+			EntityState es = _context.Entry(newEmployee).State;
+			Console.WriteLine($"EntityState B4Add:{es.GetDisplayName}");
 			_context.Employees.Add(newEmployee);
-			return _context.SaveChanges();
+			es = _context.Entry(newEmployee).State;
+			Console.WriteLine($"EntityState After Add:{es.GetDisplayName()}");
+			int result = _context.SaveChanges();
+			es = _context.Entry(newEmployee).State;
+			Console.WriteLine($"EntityState After saveChanges:{es.GetDisplayName()}");
+			return result;
 		}
 
 
 
-		public Employee UpdateEmployee(Employee updatedEmployee)
+		public int UpdateEmployee(Employee updatedEmployee)
 		{
-			_context.Employees.Update(updatedEmployee);
-			// Console.WriteLine(_context.Entry(updatedEmployee).State); // sir,i will do it , thankyou sir
-			_context.SaveChanges();
-			return updatedEmployee;
+			int result = 0;
+			EntityState es = _context.Entry(updatedEmployee).State;
+			Console.WriteLine($"EntityState B4Add:{es.GetDisplayName}");
+			_context.Entry(updatedEmployee).State = EntityState.Modified;
+			es = _context.Entry(updatedEmployee).State;
+			Console.WriteLine($"EntityState After Add:{es.GetDisplayName()}");
+			result = _context.SaveChanges();
+			es = _context.Entry(updatedEmployee).State;
+			Console.WriteLine($"EntityState After saveChanges:{es.GetDisplayName()}");
+			return result;
+
 		}
-		public int DeleteEmployee(int id)
+		public int DeleteId(Employee emp)
 		{
-			Employee emp = _context.Employees.Find(id);
+
+
 			_context.Employees.Remove(emp);
-			return _context.SaveChanges();
+			_context.SaveChanges();
+
+
+
+
+
+			return 1;
 		}
 	}
 }
